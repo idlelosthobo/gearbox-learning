@@ -1,8 +1,13 @@
 package parts
 
+import "learning/measurement"
+
 type Box struct {
-	InputShaft  Shaft
-	OutputShaft Shaft
+	InputShaft   Shaft
+	OutputShaft  Shaft
+	InteralTemp  measurement.Temperature
+	ExternalTemp measurement.Temperature
+	Efficiency   float32
 }
 
 func CreateRandomBox() Box {
@@ -13,6 +18,7 @@ func CreateRandomBox() Box {
 				0.0,
 			},
 			0.0,
+			0,
 		},
 		Shaft{
 			Gear{
@@ -20,7 +26,11 @@ func CreateRandomBox() Box {
 				0.0,
 			},
 			0.0,
+			0,
 		},
+		measurement.Temperature{20},
+		measurement.Temperature{20},
+		0.97,
 	}
 	return randomBox
 }
@@ -29,12 +39,12 @@ func (b *Box) GearRatio() int {
 	return b.OutputShaft.Gear.Teeth / b.InputShaft.Gear.Teeth
 }
 
-func (b *Box) RotateInputShaftByAngle(angle float32) {
+func (b *Box) RotateInputShaftByAngle(angle float32, kwForce int) {
 	b.InputShaft.RotateByAngle(angle)
-	b.OutputShaft.Gear.RotateByTeeth(b.InputShaft.Gear.GetTeethByRotation(angle))
-	b.OutputShaft.Angle = b.OutputShaft.Gear.Angle
+	b.OutputShaft.RotateByAngle(b.OutputShaft.Gear.GetRotationByTeeth(b.InputShaft.Gear.GetTeethByRotation(angle)))
 }
 
-func (b *Box) GetOutputShaftAngle() float32 {
-	return b.OutputShaft.Angle
+func (b *Box) ApplyForce(kwForce int) {
+	forceTemperatureDelta := (1.0 - b.Efficiency) * float32(kwForce)
+	b.InteralTemp.ApplyTempDeltaByDegreesC(forceTemperatureDelta, 1.0)
 }
