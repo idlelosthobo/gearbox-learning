@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	driveGear := parts.Gear{32, 0.0}
-	driveGear.RotateByTeeth(16)
-	fmt.Println(driveGear.Angle)
+	newBox := parts.CreateRandomBox()
+	newBox.RotateInputShaftByAngle(250)
+	fmt.Println(newBox.GetOutputShaftAngle())
 }
